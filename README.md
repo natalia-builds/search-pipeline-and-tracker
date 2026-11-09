@@ -69,6 +69,8 @@ The resume editor uses a few simple marks to know what's a heading, a bullet, or
 | Dates lined up on the right | Press **Tab** between the job title and the dates |
 | Your contact details, in smaller gray text | Put them on the line right after your name |
 
+In the editor, the Tab key types a tab. To move on to the next field, press Esc and then Tab, or press Shift+Tab to go back. The same help, with this example, is under **How to format your resume** above the editor.
+
 Here's a short example. The space before each date is a Tab.
 
 ```

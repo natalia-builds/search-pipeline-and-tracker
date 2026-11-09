@@ -74,6 +74,8 @@ const S = {
   shareFor: null as string | null,
   cFilter: "",
   hlEditing: false,
+  /** Whether the formatting help is open. Until someone opens or closes it, it's open only before the first version. */
+  helpOpen: null as boolean | null,
   hlCmpA: null as string | null,
   hlCmpB: null as string | null,
   delV: null as string | null,
@@ -221,6 +223,44 @@ function bannersHtml() {
 }
 
 /* ---------- resume ---------- */
+const FORMAT_EXAMPLE = `# Jordan Rivera
+jordan.rivera@example.com | 555.010.0199 | Springfield
+
+## Experience
+### Brightline Payments
+Senior Product Manager\t2021 - Present
+* Led an invoicing redesign that cut time to first payment by **31%**
+* Managed 4 direct reports across product and design
+
+## Education
+State University\tB.A. Economics`;
+
+function formatHelpHtml(open: boolean) {
+  const rows: [string, string][] = [
+    ["Your name, on the first line", "<code># Jordan Rivera</code>"],
+    ["A section heading", "<code>## Experience</code>"],
+    ["A company or school", "<code>### Brightline Payments</code>"],
+    ["A bullet point", "<code>* Led the redesign</code>"],
+    ["Bold text, such as a key number", "<code>**31%**</code>"],
+    ["Dates lined up on the right", "The job title, then the Tab key, then the dates"],
+    ["Contact details in smaller text", "Put them on the line right after your name"],
+  ];
+  return `<details class="format-help" id="formatHelp"${open ? " open" : ""}>
+    <summary>How to format your resume</summary>
+    <div class="format-body">
+      <p>A few simple marks tell the preview and the PDF what each line is. Your resume stays plain text, so applicant tracking systems can read the PDF.</p>
+      <table class="marks"><caption class="sr-only">Formatting marks</caption>
+        <thead><tr><th scope="col">To get</th><th scope="col">Type</th></tr></thead>
+        <tbody>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join("")}</tbody></table>
+      <p><strong>From Google Docs:</strong> choose File, then Download, then Markdown (.md). Open the downloaded file in a text editor and paste everything here. Headings come across if your resume uses Google Docs heading styles. If dates don't line up on the right, put a Tab between each job title and its dates.</p>
+      <p><strong>From Word or a PDF:</strong> paste it in, then add the marks above. You only do this once; later versions start from the last one.</p>
+      <p class="example-h"><strong>Example</strong> (the space before each date is a Tab):</p>
+      <pre class="example">${esc(FORMAT_EXAMPLE)}</pre>
+      <div class="bar"><button class="btn small" data-act="copyexample">Copy example</button></div>
+    </div>
+  </details>`;
+}
+
 function welcomeHtml() {
   return `<div class="empty-state">
     <h3>Start with your resume</h3>
@@ -272,7 +312,8 @@ function resumeHtml() {
     body = `<div class="cols"><div class="editor">
         ${draft != null && cur && draft !== cur.content ? `<div class="banner"><span>Unsaved draft based on ${esc(cur.label)}. Drafts stay in this browser until you save a version.</span><button class="btn small" data-act="discard">Discard draft</button></div>` : ""}
         <label for="ed" class="field-label">Resume text</label>
-        <p class="hint" id="edHint">Use # for headings, * for bullets, **double asterisks** for bold, and a tab between a job title and its dates.</p>
+        ${formatHelpHtml(S.helpOpen ?? !cur)}
+        <p class="hint" id="edHint">In the editor, the Tab key types a tab. To leave the editor, press Esc and then Tab, or press Shift+Tab.</p>
         <textarea id="ed" spellcheck="true" aria-describedby="edHint">${esc(text)}</textarea>
         <div class="savebar">
           <label>Version name<input class="f" id="vLabel" value="v${nextN}"></label>
@@ -886,6 +927,9 @@ function handleAction(el: HTMLElement) {
       return render("#ed");
     case "savev":
       return saveVersion();
+    case "copyexample":
+      copyText(FORMAT_EXAMPLE);
+      return;
     case "copy": {
       const v = vById(id);
       if (v) copyText(plain(v.content));
@@ -1139,6 +1183,33 @@ document.addEventListener("change", (e) => {
 });
 
 let sideTimer: number | undefined;
+// "toggle" doesn't bubble, so listen while the event travels down instead.
+document.addEventListener(
+  "toggle",
+  (e) => {
+    if ((e.target as HTMLElement).id === "formatHelp") S.helpOpen = (e.target as HTMLDetailsElement).open;
+  },
+  true,
+);
+
+// In the resume editor, Tab types a tab (used to line up dates). Esc then Tab, or Shift+Tab,
+// moves focus as usual, so keyboard users are never stuck in the editor.
+let escBeforeTab = false;
+document.addEventListener("keydown", (e) => {
+  const t = e.target as HTMLTextAreaElement;
+  if (t.id !== "ed") return;
+  if (e.key === "Escape") {
+    escBeforeTab = true;
+    return;
+  }
+  if (e.key === "Tab" && !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && !escBeforeTab) {
+    e.preventDefault();
+    t.setRangeText("\t", t.selectionStart, t.selectionEnd, "end");
+    t.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  escBeforeTab = false;
+});
+
 document.addEventListener("input", (e) => {
   const t = e.target as HTMLInputElement;
   if (t.getAttribute("aria-invalid") === "true" && t.value.trim() && t.closest("#appForm, #contactForm")) t.removeAttribute("aria-invalid");

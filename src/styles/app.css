@@ -216,3 +216,16 @@ textarea#hlEd { width: 100%; min-height: 96px; resize: vertical; padding: 12px; 
 @media (forced-colors: active) { .dot { forced-color-adjust: none; } .mtab[aria-current="page"], .tab[aria-current="true"] { text-decoration: underline; } }
 .inline-select { display: flex; gap: 6px; align-items: center; font-size: 14px; }
 .inline-select .f { width: auto; padding: 6px 8px; }
+
+/* Formatting help in the resume editor */
+.format-help { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.format-help summary { cursor: pointer; padding: 10px 14px; font-weight: 600; color: var(--accent); }
+.format-body { padding: 0 14px 14px; display: grid; gap: 10px; }
+.format-body p { margin: 0; max-width: 70ch; }
+.marks { border-collapse: collapse; width: 100%; font-size: 14px; }
+.marks th, .marks td { text-align: left; vertical-align: top; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.marks th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+.marks td:first-child { width: 45%; }
+code, .example { font-family: var(--font-mono); font-size: 13px; }
+code { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+.example { margin: 0; padding: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 6; }
