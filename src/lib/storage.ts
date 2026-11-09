@@ -1,6 +1,6 @@
 // Saving and loading. Everything is kept in this browser's localStorage under one key, and nothing
 // is ever sent to a server. Backups are plain JSON files the person downloads and keeps.
-import { defaultSettings, emptyLibrary, SCHEMA_VERSION, STATUSES, type Library, type Settings } from "./types";
+import { defaultSettings, emptyLibrary, MAX_PAGE_LIMIT, SCHEMA_VERSION, STATUSES, type Library, type Settings } from "./types";
 
 export const STORAGE_KEY = "spt.library";
 const BACKUP_APP = "search-pipeline-and-tracker";
@@ -30,6 +30,7 @@ function normalizeSettings(raw: unknown): Settings {
     teamSizes: arr(raw.teamSizes).map(Number).filter((n) => Number.isInteger(n) && n > 0),
     toneWords: Array.isArray(raw.toneWords) ? strList(raw.toneWords) : d.toneWords,
     flagDashes: typeof raw.flagDashes === "boolean" ? raw.flagDashes : d.flagDashes,
+    pageLimit: Number.isInteger(raw.pageLimit) && (raw.pageLimit as number) >= 0 && (raw.pageLimit as number) <= MAX_PAGE_LIMIT ? (raw.pageLimit as number) : d.pageLimit,
     payFloor: Math.max(0, Number(raw.payFloor) || 0),
     workSetups: Array.isArray(raw.workSetups) && raw.workSetups.length ? strList(raw.workSetups) : d.workSetups,
     flaggedSetups: Array.isArray(raw.flaggedSetups) ? strList(raw.flaggedSetups) : d.flaggedSetups,

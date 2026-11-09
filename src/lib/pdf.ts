@@ -229,19 +229,23 @@ async function loadFonts(base: string): Promise<Fonts | null> {
 export interface PdfResult {
   blob: Blob;
   pages: number;
-  /** False when "fit to one page" was asked for but the resume was too long at a readable size. */
+  /** False when a page limit was set but the resume didn't fit within it at a readable size. */
   fit: boolean;
 }
 
-export async function makeResumePdf(md: string, onePage: boolean, base: string): Promise<PdfResult> {
+/**
+ * Builds the PDF. With a page limit (1 or more), it shrinks the text a little at a time to fit,
+ * never below 84% size, then tries tighter spacing. A limit of 0 means no limit.
+ */
+export async function makeResumePdf(md: string, pageLimit: number, base: string): Promise<PdfResult> {
   const [{ jsPDF }, fonts] = await Promise.all([import("jspdf"), loadFonts(base)]);
   const done = (doc: JsPDF, fit: boolean): PdfResult => ({ blob: doc.output("blob"), pages: doc.getNumberOfPages(), fit });
-  if (!onePage) return done(build(jsPDF, md, 1, fonts, false), true);
-  // Shrink a little at a time, never below 84% size. Then try again with tighter spacing.
+  const full = build(jsPDF, md, 1, fonts, false);
+  if (pageLimit < 1 || full.getNumberOfPages() <= pageLimit) return done(full, true);
   for (const tight of [false, true])
     for (let s = 1; s >= 0.84; s = Math.round((s - 0.02) * 100) / 100) {
       const doc = build(jsPDF, md, s, fonts, tight);
-      if (doc.getNumberOfPages() === 1) return done(doc, true);
+      if (doc.getNumberOfPages() <= pageLimit) return done(doc, true);
     }
-  return done(build(jsPDF, md, 1, fonts, false), false);
+  return done(full, false);
 }

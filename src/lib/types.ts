@@ -4,6 +4,8 @@ export const SCHEMA_VERSION = 1;
 
 export const STATUSES = ["Interested", "Applied", "Screening", "Interviewing", "Offer", "Closed"] as const;
 export type Status = (typeof STATUSES)[number];
+/** The highest page limit offered in the PDF options. */
+export const MAX_PAGE_LIMIT = 4;
 export const BONUS_OPTIONS = ["Unknown", "Mentioned", "Not mentioned"] as const;
 
 export interface ExperienceClaim {
@@ -23,6 +25,8 @@ export interface Settings {
   teamSizes: number[];
   toneWords: string[];
   flagDashes: boolean;
+  /** The most pages the PDF may use. The text shrinks a little to fit. 0 means no limit. */
+  pageLimit: number;
   /** Flag roles whose posted base pay tops out under this amount. 0 turns it off. */
   payFloor: number;
   workSetups: string[];
@@ -111,6 +115,7 @@ export function defaultSettings(): Settings {
     teamSizes: [],
     toneWords: ["excited", "thrilled", "passionate", "energized"],
     flagDashes: true,
+    pageLimit: 1,
     payFloor: 0,
     workSetups: ["Remote", "Hybrid", "On-site", "Requires relocation"],
     flaggedSetups: ["Requires relocation"],

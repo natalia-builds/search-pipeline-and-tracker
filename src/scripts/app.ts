@@ -5,7 +5,7 @@ import { lineDiff, wordDiff } from "../lib/diff";
 import { boldedMetrics, bulletCount, esc, plain, renderMarkdown, wordCount } from "../lib/markdown";
 import { sampleLibrary } from "../lib/sample";
 import { backupFilename, exportBackup, loadLibrary, parseBackup, saveLibrary, STORAGE_KEY, type KeyValueStore } from "../lib/storage";
-import { BONUS_OPTIONS, emptyLibrary, STATUSES, type Application, type Contact, type Library, type Settings } from "../lib/types";
+import { BONUS_OPTIONS, emptyLibrary, MAX_PAGE_LIMIT, STATUSES, type Application, type Contact, type Library, type Settings } from "../lib/types";
 
 const $ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const BASE = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + "/";
@@ -181,6 +181,14 @@ function sentTo(vid: string) {
 const versionOption = (v: { id: string; label: string; createdAt: string; note: string }, selected: boolean) =>
   `<option value="${esc(v.id)}"${selected ? " selected" : ""}>${esc(v.label)} - ${fmtDate(v.createdAt)}${v.note ? " - " + esc(v.note.slice(0, 36)) : ""}</option>`;
 
+const pages = (n: number) => `${n} page${n === 1 ? "" : "s"}`;
+function pageLimitOptions() {
+  const cur = lib.settings.pageLimit;
+  const opts = [`<option value="0"${cur === 0 ? " selected" : ""}>No limit</option>`];
+  for (let n = 1; n <= MAX_PAGE_LIMIT; n++) opts.push(`<option value="${n}"${cur === n ? " selected" : ""}>${pages(n)}</option>`);
+  return opts.join("");
+}
+
 /* ---------- header, nav and banners ---------- */
 function renderNav() {
   const active = lib.applications.filter((a) => a.status !== "Closed").length;
@@ -252,7 +260,7 @@ function resumeHtml() {
     const old = v.id !== cur.id;
     body = `${old ? `<div class="banner"><span>Viewing ${esc(v.label)} from ${fmtDate(v.createdAt)}. The current version is ${esc(cur.label)}.</span><span class="bar"><button class="btn small" data-act="setcur" data-id="${esc(v.id)}">Make ${esc(v.label)} current</button><button class="btn small" data-act="viewcur">Back to current</button></span></div>` : ""}
       <div class="bar"><button class="btn primary" data-act="pdf" data-id="${esc(v.id)}">Download PDF</button>
-        <label class="check-lbl"><input type="checkbox" id="onePage"${pref.get("onePage") === "0" ? "" : " checked"}> Fit to one page</label>
+        <label class="inline-select">Page limit <select class="f" id="pageLimit">${pageLimitOptions()}</select></label>
         <button class="btn" data-act="copy" data-id="${esc(v.id)}">Copy as plain text</button><button class="btn" data-act="toedit" data-id="${esc(v.id)}">Edit from this version</button></div>
       <div class="bar">${v.note ? `<span class="hint">${esc(v.label)}: ${esc(v.note)}</span>` : ""}${sentTo(v.id)}</div>
       <div class="cols"><article class="sheet" aria-label="Resume ${esc(v.label)}">${renderMarkdown(v.content)}</article>${sideHtml(v.content)}</div>`;
@@ -598,6 +606,7 @@ function readSettings(form: HTMLFormElement): { settings: Settings; errors: { id
       teamSizes: teams.filter((n) => Number.isInteger(n) && n > 0),
       toneWords: list("sTone"),
       flagDashes: !!form.querySelector<HTMLInputElement>("#sDashes")?.checked,
+      pageLimit: lib.settings.pageLimit,
       payFloor: pay,
       workSetups: setups,
       flaggedSetups: list("sFlagged"),
@@ -672,13 +681,17 @@ async function downloadPdf(btn: HTMLButtonElement, vid: string) {
   if (!v) return;
   btn.disabled = true;
   announce("Building PDF...");
-  const onePage = $<HTMLInputElement>("#onePage")?.checked ?? true;
+  const limit = lib.settings.pageLimit;
   try {
     const { makeResumePdf } = await import("../lib/pdf");
-    const res = await makeResumePdf(v.content, onePage, BASE);
+    const res = await makeResumePdf(v.content, limit, BASE);
     const name = (lib.settings.name || "Resume").replace(/[\\/:*?"<>|]/g, "");
     download(res.blob, `${name} Resume ${v.label.replace(/[\\/:*?"<>|]/g, "")}.pdf`);
-    announce(res.fit ? `PDF downloaded (${res.pages} page${res.pages > 1 ? "s" : ""}).` : `Too long for one page at a readable size, so the PDF is ${res.pages} pages. Trim a bullet or two and try again.`);
+    announce(
+      res.fit
+        ? `PDF downloaded (${pages(res.pages)}).`
+        : `Too long for ${pages(limit)} at a readable size, so the PDF is ${pages(res.pages)}. Trim a bullet or two, or raise the page limit, and try again.`,
+    );
   } catch (err) {
     announce("Couldn't build the PDF: " + (err as Error).message);
   } finally {
@@ -1094,7 +1107,10 @@ document.addEventListener("submit", (e) => {
 
 document.addEventListener("change", (e) => {
   const t = e.target as HTMLInputElement;
-  if (t.id === "onePage") pref.set("onePage", t.checked ? "1" : "0");
+  if (t.id === "pageLimit") {
+    const n = Number(t.value);
+    commit((l) => (l.settings.pageLimit = n), n ? `PDFs will fit within ${pages(n)}.` : "PDFs will use as many pages as the resume needs.");
+  }
   if (t.id === "hlA" || t.id === "hlB") {
     S.hlCmpA = $<HTMLSelectElement>("#hlA")!.value;
     S.hlCmpB = $<HTMLSelectElement>("#hlB")!.value;

@@ -214,3 +214,5 @@ textarea#hlEd { width: 100%; min-height: 96px; resize: vertical; padding: 12px; 
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 @media (forced-colors: active) { .dot { forced-color-adjust: none; } .mtab[aria-current="page"], .tab[aria-current="true"] { text-decoration: underline; } }
+.inline-select { display: flex; gap: 6px; align-items: center; font-size: 14px; }
+.inline-select .f { width: auto; padding: 6px 8px; }
