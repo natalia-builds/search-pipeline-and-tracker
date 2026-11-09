@@ -1,0 +1,16 @@
+# Downloaded packages
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Secrets and local settings
+.env
+.env.*
+
+# Mac system files
+.DS_Store
+
+# Local Claude Code app settings
+.claude/
