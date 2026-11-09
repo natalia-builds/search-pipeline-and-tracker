@@ -19,6 +19,10 @@ A free, open-source job search tracker that runs entirely in the browser. It sta
 
 Everything must meet **WCAG 2.2 Level AA**: real HTML controls, full keyboard use with visible focus, labels on every field, errors linked to their field with `aria-invalid`, changes announced through the `#status` live region, 4.5:1 text contrast in light and dark mode, never color alone, and no sideways scrolling at 375px. The page redraws its sections, so keep focus on the control the person was using (`render(focusTarget)`). Say what was and wasn't tested.
 
+## Publishing
+
+The live site is <https://natalia-builds.github.io/search-pipeline-and-tracker/>. The GitHub Actions workflow in `.github/workflows/publish.yml` tests and builds every pull request, and publishes to GitHub Pages when something is merged into `main`. Anything merged goes public, so review before merging. The site lives under `/search-pipeline-and-tracker/`, so file addresses must go through `import.meta.env.BASE_URL`, never a bare `/`.
+
 ## Workflow
 
 - Never commit directly to `main`. Use a short-lived branch and a pull request with one purpose.
