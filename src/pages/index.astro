@@ -1,0 +1,37 @@
+---
+import "../styles/app.css";
+const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + "/";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job Search Tracker</title>
+    <meta name="description" content="A free, private tracker for your resume versions, job applications, contacts, and LinkedIn headline. Everything stays in your browser." />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#work">Skip to main content</a>
+    <div class="wrap" id="app">
+      <header class="top">
+        <div>
+          <h1>Job Search Tracker</h1>
+          <p>Your resume versions, the applications they went to, and the people you shared them with.</p>
+        </div>
+      </header>
+      <nav class="main-tabs" id="nav" aria-label="Sections"></nav>
+      <p id="status" class="status-line" role="status" aria-live="polite"></p>
+      <div id="banners"></div>
+      <main class="work" id="work" tabindex="-1">
+        <noscript><p>This tracker needs JavaScript turned on.</p></noscript>
+      </main>
+      <footer class="foot">
+        <p>Private by design: everything you enter is saved only in this browser on this device. No accounts, no tracking, nothing sent to a server.</p>
+      </footer>
+    </div>
+    <script>
+      import "../scripts/app.ts";
+    </script>
+  </body>
+</html>
