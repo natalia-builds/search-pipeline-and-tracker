@@ -2,8 +2,14 @@
 
 export const SCHEMA_VERSION = 1;
 
-export const STATUSES = ["Interested", "Applied", "Screening", "Interviewing", "Offer", "Closed"] as const;
+export const STATUSES = ["Interested", "Applied", "Screening", "Interviewing", "Offer", "Rejected", "Withdrawn", "Closed"] as const;
 export type Status = (typeof STATUSES)[number];
+/**
+ * Stages where the role is over, so it leaves the "Active" count and stops getting overdue warnings.
+ * Rejected: the company passed. Withdrawn: you pulled out. Closed: the role was filled, paused, or went quiet.
+ */
+export const ENDED_STATUSES: readonly Status[] = ["Rejected", "Withdrawn", "Closed"];
+export const isActive = (status: Status): boolean => !ENDED_STATUSES.includes(status);
 /** The highest page limit offered in the PDF options. */
 export const MAX_PAGE_LIMIT = 4;
 export const BONUS_OPTIONS = ["Unknown", "Mentioned", "Not mentioned"] as const;
