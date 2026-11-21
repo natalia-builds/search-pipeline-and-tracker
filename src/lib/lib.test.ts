@@ -4,7 +4,7 @@ import { lineDiff, wordDiff } from "./diff";
 import { boldedMetrics, esc, plain, renderMarkdown, wordCount } from "./markdown";
 import { sampleLibrary } from "./sample";
 import { exportBackup, loadLibrary, normalize, parseBackup, saveLibrary, STORAGE_KEY, type KeyValueStore } from "./storage";
-import { defaultSettings, emptyLibrary, type Application, type Settings } from "./types";
+import { defaultSettings, emptyLibrary, isActive, STATUSES, type Application, type Settings } from "./types";
 
 const settings = (over: Partial<Settings> = {}): Settings => ({ ...defaultSettings(), ...over });
 const memoryStore = (): KeyValueStore & { data: Map<string, string> } => {
@@ -95,9 +95,15 @@ describe("application flags", () => {
     expect(applicationFlags(app({}), settings(), "2026-01-01")).toEqual([]);
     expect(applicationFlags(app({}), settings({ payFloor: 200000 }), "2026-01-01")).toEqual(["Pay tops out under $200K"]);
   });
-  it("flags overdue next steps, but not for closed roles", () => {
+  it("flags overdue next steps, but not for roles that have ended", () => {
     expect(applicationFlags(app({ nextDate: "2025-12-31" }), settings(), "2026-01-01")).toContain("Next step overdue");
-    expect(applicationFlags(app({ nextDate: "2025-12-31", status: "Closed" }), settings(), "2026-01-01")).toEqual([]);
+    for (const status of ["Rejected", "Withdrawn", "Closed", "Offer"] as const) {
+      expect(applicationFlags(app({ nextDate: "2025-12-31", status }), settings(), "2026-01-01")).toEqual([]);
+    }
+  });
+  it("counts only roles that haven't ended as active", () => {
+    for (const status of ["Interested", "Applied", "Screening", "Interviewing", "Offer"] as const) expect(isActive(status)).toBe(true);
+    for (const status of ["Rejected", "Withdrawn", "Closed"] as const) expect(isActive(status)).toBe(false);
   });
 });
 
@@ -132,6 +138,15 @@ describe("storage and backups", () => {
   it("round-trips a backup file", () => {
     const lib = sampleLibrary(new Date("2026-03-01T12:00:00Z"));
     expect(parseBackup(exportBackup(lib))).toEqual(lib);
+  });
+  it("keeps every application stage through a backup, and older backups still load", () => {
+    const lib = emptyLibrary();
+    const template = sampleLibrary(new Date("2026-03-01T12:00:00Z")).applications[0];
+    lib.applications = STATUSES.map((status, i) => ({ ...template, id: `a-${i}`, status }));
+    expect(parseBackup(exportBackup(lib)).applications.map((a) => a.status)).toEqual([...STATUSES]);
+    // A backup made before Rejected and Withdrawn existed only used the older stages.
+    const old = normalize({ applications: [{ id: "a", status: "Closed" }, { id: "b", status: "Offer" }] });
+    expect(old.applications.map((a) => a.status)).toEqual(["Closed", "Offer"]);
   });
   it("rejects files that aren't backups", () => {
     expect(() => parseBackup("hello")).toThrow(/isn't a backup/);

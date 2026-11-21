@@ -16,7 +16,7 @@
   --add-bg: #dff1e6; --add-fg: #145233;
   --del-bg: #f8e1df; --del-fg: #8a2a20;
   --ok: #24764f; --warn: #85600a; --fail: #b3362a;
-  --st-interested: #626b76; --st-applied: #2a64a0; --st-screening: #5f4fc4; --st-interviewing: #8f560a; --st-offer: #1f7a4d; --st-closed: #6a7077;
+  --st-interested: #626b76; --st-applied: #2a64a0; --st-screening: #5f4fc4; --st-interviewing: #8f560a; --st-offer: #1f7a4d; --st-rejected: #b3473a; --st-withdrawn: #7a6244; --st-closed: #6a7077;
   --font-doc: Georgia, "Times New Roman", serif;
   --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, Menlo, Consolas, monospace;
@@ -28,7 +28,7 @@
     --accent: #7fb3e6; --accent-doc: #7fb3e6; --accent-soft: #1f2f42; --on-accent: #10161d;
     --add-bg: #1d3a2a; --add-fg: #9fdcb7; --del-bg: #3d2220; --del-fg: #f0aaa1;
     --ok: #6fcf9a; --warn: #e2b34d; --fail: #f08a7d;
-    --st-interested: #9aa4b0; --st-applied: #7fb3e6; --st-screening: #a99cf0; --st-interviewing: #e2a95a; --st-offer: #6fcf9a; --st-closed: #8f97a0;
+    --st-interested: #9aa4b0; --st-applied: #7fb3e6; --st-screening: #a99cf0; --st-interviewing: #e2a95a; --st-offer: #6fcf9a; --st-rejected: #f08a7d; --st-withdrawn: #c4ab88; --st-closed: #8f97a0;
   }
 }
 
@@ -179,7 +179,7 @@ textarea#hlEd { width: 100%; min-height: 96px; resize: vertical; padding: 12px; 
 .meta b { color: var(--ink); font-weight: 500; }
 .status { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
 .s-Interested { color: var(--st-interested); } .s-Applied { color: var(--st-applied); } .s-Screening { color: var(--st-screening); }
-.s-Interviewing { color: var(--st-interviewing); } .s-Offer { color: var(--st-offer); } .s-Closed { color: var(--st-closed); }
+.s-Interviewing { color: var(--st-interviewing); } .s-Offer { color: var(--st-offer); } .s-Rejected { color: var(--st-rejected); } .s-Withdrawn { color: var(--st-withdrawn); } .s-Closed { color: var(--st-closed); }
 .flags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .pipeline { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 @media (max-width: 760px) { .pipeline { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

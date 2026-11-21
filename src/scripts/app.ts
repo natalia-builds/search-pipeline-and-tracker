@@ -5,7 +5,7 @@ import { lineDiff, wordDiff } from "../lib/diff";
 import { boldedMetrics, bulletCount, esc, plain, renderMarkdown, wordCount } from "../lib/markdown";
 import { sampleLibrary } from "../lib/sample";
 import { backupFilename, exportBackup, loadLibrary, parseBackup, saveLibrary, STORAGE_KEY, type KeyValueStore } from "../lib/storage";
-import { BONUS_OPTIONS, emptyLibrary, MAX_PAGE_LIMIT, STATUSES, type Application, type Contact, type Library, type Settings } from "../lib/types";
+import { BONUS_OPTIONS, emptyLibrary, isActive, MAX_PAGE_LIMIT, STATUSES, type Application, type Contact, type Library, type Settings } from "../lib/types";
 
 const $ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const BASE = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + "/";
@@ -193,7 +193,7 @@ function pageLimitOptions() {
 
 /* ---------- header, nav and banners ---------- */
 function renderNav() {
-  const active = lib.applications.filter((a) => a.status !== "Closed").length;
+  const active = lib.applications.filter((a) => isActive(a.status)).length;
   const items: [Section, string, string][] = [
     ["resume", "Resume", current()?.label || ""],
     ["apps", "Applications", String(active)],
@@ -308,7 +308,7 @@ function resumeHtml() {
     const draft = pref.get(DRAFT);
     const text = draft ?? (cur ? cur.content : "");
     const nextN = (vs.slice(-1)[0]?.n || 0) + 1;
-    const openApps = lib.applications.filter((a) => a.status !== "Closed");
+    const openApps = lib.applications.filter((a) => isActive(a.status));
     body = `<div class="cols"><div class="editor">
         ${draft != null && cur && draft !== cur.content ? `<div class="banner"><span>Unsaved draft based on ${esc(cur.label)}. Drafts stay in this browser until you save a version.</span><button class="btn small" data-act="discard">Discard draft</button></div>` : ""}
         <label for="ed" class="field-label">Resume text</label>
@@ -377,11 +377,11 @@ function appForm(a: Application | null) {
 
 function appsHtml() {
   const apps = lib.applications;
-  const active = apps.filter((a) => a.status !== "Closed").length;
+  const active = apps.filter((a) => isActive(a.status)).length;
   const stages: [string, number][] = [["Active", active], ...STATUSES.map((s) => [s, apps.filter((a) => a.status === s).length] as [string, number])];
   const list = apps
-    .filter((a) => S.filter === "All" || (S.filter === "Active" ? a.status !== "Closed" : a.status === S.filter))
-    .sort((a, b) => Number(a.status === "Closed") - Number(b.status === "Closed") || b.updatedAt.localeCompare(a.updatedAt));
+    .filter((a) => S.filter === "All" || (S.filter === "Active" ? isActive(a.status) : a.status === S.filter))
+    .sort((a, b) => Number(!isActive(a.status)) - Number(!isActive(b.status)) || b.updatedAt.localeCompare(a.updatedAt));
   const head = `<div class="work-head"><div><h2>Applications</h2><p class="sub">Each role you pursue, where it stands, and the resume version you sent.</p></div>
     <div class="bar"><button class="btn primary" data-act="newapp">Add application</button></div></div>`;
   const pipe = `<div class="pipeline" role="group" aria-label="Filter by stage">${stages

@@ -1,7 +1,7 @@
 // The checks shown beside the resume and headline. Every rule comes from the person's own settings,
 // so the app has nothing personal built in.
 import { plain } from "./markdown";
-import type { Application, Settings } from "./types";
+import { isActive, type Application, type Settings } from "./types";
 
 export type Level = "ok" | "warn" | "fail";
 export interface Check {
@@ -115,6 +115,6 @@ export function applicationFlags(a: Application, s: Settings, today: string): st
   else if (s.payFloor > 0 && top && top < s.payFloor) flags.push(`Pay tops out under $${Math.round(s.payFloor / 1000)}K`);
   if (a.bonus === "Not mentioned") flags.push("No bonus mentioned - ask about structure");
   if (a.setup && s.flaggedSetups.includes(a.setup)) flags.push(a.setup);
-  if (a.nextDate && a.nextDate < today && !["Closed", "Offer"].includes(a.status)) flags.push("Next step overdue");
+  if (a.nextDate && a.nextDate < today && (isActive(a.status) && a.status !== "Offer")) flags.push("Next step overdue");
   return flags;
 }

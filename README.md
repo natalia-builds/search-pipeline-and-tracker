@@ -30,7 +30,7 @@ There's nothing to install and no account to create. Everything you enter stays 
 - Run checks you set up: words every version must include, the years of experience you claim, team sizes, words to avoid, and em dashes.
 
 **Applications**
-- Track each role from Interested through Applied, Screening, Interviewing, Offer, and Closed.
+- Track each role from Interested through Applied, Screening, Interviewing, and Offer. When a role ends, mark it Rejected (the company passed), Withdrawn (you pulled out), or Closed (filled, paused, or went quiet). Ended roles leave the Active count.
 - Record the resume version you sent, the pay range, the work setup, the next step and its date, a referral, and notes.
 - Get flags for overdue next steps, no posted pay range, pay below your target, and work setups you want to avoid.
 
