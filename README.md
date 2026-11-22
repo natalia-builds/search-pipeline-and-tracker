@@ -8,8 +8,17 @@ There's nothing to install and no account to create. Everything you enter stays 
 
 ![The Job Search Tracker showing a sample resume, with checks and word counts beside it](docs/screenshot.png)
 
+## Status
+
+**This browser version is complete and is no longer where new work happens.** It does everything described below, and it stays online. Future improvements go to the [local app](https://github.com/natalia-builds/search-pipeline-tracker-app), which is the same tracker with its data saved to a file on your computer instead of in your browser.
+
+- **Choose this version** if you want nothing to install and are fine with your data living in one browser on one device.
+- **Choose the local app** if you want your data in a file you own, with automatic daily copies. It currently needs Node.js and a terminal to run.
+- **Already have data here?** Download a backup from Settings and follow [Moving over from the browser version](https://github.com/natalia-builds/search-pipeline-tracker-app#moving-over-from-the-browser-version) in the app's README.
+
 ## Contents
 
+- [Status](#status)
 - [What it does](#what-it-does)
 - [Getting started](#getting-started)
 - [Formatting your resume](#formatting-your-resume)
