@@ -14,6 +14,7 @@ A free, open-source job search tracker that runs entirely in the browser. It sta
 - `src/lib/`: logic with tests (Markdown, diff, checks, storage and backups, PDF, sample data).
 - `src/scripts/app.ts`: the interactive page (rendering and event handling).
 - `src/pages/index.astro`: the page shell. `src/styles/app.css`: styles and color tokens.
+- `docs/`: the README screenshot and the resume formatting guide. The README follows the maintainer's shared README structure (Status, who it's for, what it does, design decisions and tradeoffs, roadmap, limitations, how to use it, for developers). Keep "Status" and "Limitations" honest when things change, and state only facts that can be verified.
 
 ## Accessibility
 
