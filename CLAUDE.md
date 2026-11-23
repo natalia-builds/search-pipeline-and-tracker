@@ -28,6 +28,7 @@ The live site is <https://natalia-builds.github.io/search-pipeline-and-tracker/>
 ## Workflow
 
 - Never commit directly to `main`. Use a short-lived branch and a pull request with one purpose.
+- GitHub enforces that: a ruleset named "Protect main" (repository Settings, Rules) requires a pull request, blocks force pushes and deletion of `main`, applies to the maintainer too, and requires the `build` job of `.github/workflows/publish.yml` ("Test and publish") to pass. It requires no approving reviews, because the maintainer is the only reviewer. The `publish` job is not required, since it only runs after a merge. The check is required by its exact name, so renaming the `build` job leaves the old name required and blocks every merge until the ruleset is edited to match.
 - Run `npm test` and `npm run build` before every commit.
 - Check changes in a browser: awkward inputs, a 375px phone width, and dark mode.
 - This repository is public. Never commit personal resume data or secrets.
