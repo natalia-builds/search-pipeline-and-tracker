@@ -15,6 +15,7 @@ A free, open-source job search tracker that runs entirely in the browser. It sta
 - `src/scripts/app.ts`: the interactive page (rendering and event handling).
 - `src/pages/index.astro`: the page shell. `src/styles/app.css`: styles and color tokens.
 - `docs/`: the README screenshot and the resume formatting guide. The README follows the maintainer's shared README structure (Status, who it's for, what it does, design decisions and tradeoffs, roadmap, limitations, how to use it, for developers). Keep "Status" and "Limitations" honest when things change, and state only facts that can be verified.
+- `.github/ISSUE_TEMPLATE/`: the two issue templates GitHub offers on "New issue": `task.md` (Why, What to do, Done when as real checkboxes, Before you start) and `decision.md` (a "decide X" issue that ends in a record under `docs/decisions/`). Start every issue from one of them. When an issue closes, tick the Done-when boxes that were actually verified, and leave the others unticked with a comment saying why.
 
 ## Accessibility
 
